@@ -52,6 +52,15 @@ label define dept     101 "Sosiologi" 102 "Ilmu Komunikasi" 103 "Ilmu Hubungan I
                       203 "Teknik Mesin dan Industri" 204 "Teknik Elektro dan Teknologi Informasi" ///
                       205 "Teknik Kimia" 206 "Teknik Geodesi" 207 "Teknik Geologi"              ///
                       208 "Teknik Nuklir dan Teknik Fisika"
+label define prodi    1011 "Sosiologi" 1021 "Ilmu Komunikasi" 1031 "Ilmu Hubungan Internasional"      ///
+                      1041 "Manajemen dan Kebijakan Publik" 1051 "Politik dan Pemerintahan"         ///
+                      1061 "Pembangunan Sosial dan Kesejahteraan"                                    ///
+                      2011 "Teknik Sipil" 2012 "Teknik Infrastruktur Lingkungan" 2013 "Teknik Sumber Daya Air" ///
+                      2021 "Arsitektur" 2022 "Perencanaan Wilayah dan Kota"                         ///
+                      2031 "Teknik Mesin" 2032 "Teknik Industri"                                     ///
+                      2041 "Teknik Elektro" 2042 "Teknologi Informasi" 2043 "Teknik Biomedis"        ///
+                      2051 "Teknik Kimia" 2061 "Teknik Geodesi" 2071 "Teknik Geologi"                ///
+                      2081 "Teknik Nuklir" 2082 "Teknik Fisika"
 label define angk     2019 "Sebelum 2020"
 label define pend     1 "Tidak sekolah" 2 "SD" 3 "SMP" 4 "SMA/SMK" 5 "D1-D3" 6 "D4/S1" 7 "S2" 8 "S3" ///
                       .b "Tidak tahu" .c "Tidak berlaku"
@@ -72,6 +81,7 @@ label values consent aktif teman teman_ugm wawancara yn
 label values jk jk
 label values fak fak
 label values dept dept
+label values prodi prodi
 label values angkatan angk
 label values pend_ayah pend_ibu pend_wali pend
 label values pengasuh asuh
@@ -91,7 +101,8 @@ label var jk          "Jenis kelamin"
 label var aktif       "Mahasiswa S1 aktif UGM"
 label var usia        "Usia (tahun)"
 label var fak         "Fakultas"
-label var dept        "Departemen"
+label var dept        "Departemen (strata sampling)"
+label var prodi       "Program studi (otomatis bila departemen hanya punya satu prodi)"
 label var angkatan    "Angkatan"
 label var pend_ayah   "Pendidikan terakhir ayah"
 label var pend_ibu    "Pendidikan terakhir ibu"

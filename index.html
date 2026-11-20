@@ -146,6 +146,8 @@ const KEY='kuesioner-skripsi-v2';
 let A={},cur=0;
 const PEND=[[1,'Tidak sekolah'],[2,'SD sederajat'],[3,'SMP sederajat'],[4,'SMA/SMK sederajat'],[5,'D1–D3'],[6,'D4/S1'],[7,'S2'],[8,'S3'],[98,'Tidak tahu'],[99,'Tidak berlaku (meninggal atau tidak pernah hadir)']];
 const DEPT={1:[[101,'Sosiologi'],[102,'Ilmu Komunikasi'],[103,'Ilmu Hubungan Internasional'],[104,'Manajemen dan Kebijakan Publik'],[105,'Politik dan Pemerintahan'],[106,'Pembangunan Sosial dan Kesejahteraan']],2:[[201,'Teknik Sipil dan Lingkungan'],[202,'Teknik Arsitektur dan Perencanaan'],[203,'Teknik Mesin dan Industri'],[204,'Teknik Elektro dan Teknologi Informasi'],[205,'Teknik Kimia'],[206,'Teknik Geodesi'],[207,'Teknik Geologi'],[208,'Teknik Nuklir dan Teknik Fisika']]};
+const PRODI={101:[[1011,'Sosiologi']],102:[[1021,'Ilmu Komunikasi']],103:[[1031,'Ilmu Hubungan Internasional']],104:[[1041,'Manajemen dan Kebijakan Publik']],105:[[1051,'Politik dan Pemerintahan']],106:[[1061,'Pembangunan Sosial dan Kesejahteraan']],
+ 201:[[2011,'Teknik Sipil'],[2012,'Teknik Infrastruktur Lingkungan'],[2013,'Teknik Sumber Daya Air']],202:[[2021,'Arsitektur'],[2022,'Perencanaan Wilayah dan Kota']],203:[[2031,'Teknik Mesin'],[2032,'Teknik Industri']],204:[[2041,'Teknik Elektro'],[2042,'Teknologi Informasi'],[2043,'Teknik Biomedis']],205:[[2051,'Teknik Kimia']],206:[[2061,'Teknik Geodesi']],207:[[2071,'Teknik Geologi']],208:[[2081,'Teknik Nuklir'],[2082,'Teknik Fisika']]};
 const ASET=['Tabung gas 5,5 kg atau lebih','Lemari es/kulkas','AC','Pemanas air (water heater)','Komputer/laptop','Televisi layar datar minimal 30 inci','Emas/perhiasan minimal 10 gram','Sepeda motor','Mobil','Lahan (selain yang ditempati rumah)','Rumah lain selain yang ditempati'];
 const MRNI={1:'Laki-laki tidak boleh mengakui ketika orang lain menyakiti perasaannya.',2:'Laki-laki seharusnya tidak terbawa perasaan dalam situasi yang penuh emosi.',3:'Laki-laki seharusnya tidak terlalu cepat menunjukkan kepada orang lain bahwa ia peduli kepada mereka.',4:'Laki-laki seharusnya memiliki keterampilan pertukangan untuk memperbaiki rumah.',5:'Laki-laki seharusnya mampu memperbaiki sebagian besar barang di rumah.',6:'Laki-laki seharusnya tahu cara memperbaiki kendaraannya sendiri jika mogok.',7:'Kaum homoseksual tidak boleh menikah.',8:'Tidak seharusnya ada tempat berkumpul khusus kaum homoseksual.',9:'Kaum homoseksual tidak boleh berciuman di tempat umum.',10:'Laki-laki seharusnya menonton pertandingan olahraga seperti sepak bola, bukan sinetron/drama.',11:'Laki-laki seharusnya lebih memilih menonton film laga daripada membaca novel romantis.',12:'Anak laki-laki seharusnya lebih memilih bermain mobil-mobilan daripada boneka.',13:'Laki-laki seharusnya selalu suka berhubungan seks.',14:'Laki-laki tidak seharusnya menolak ajakan berhubungan seks.',15:'Laki-laki seharusnya selalu siap untuk berhubungan seks.',16:'Presiden Indonesia seharusnya selalu laki-laki.',17:'Laki-laki seharusnya menjadi pemimpin dalam kelompok apa pun.',18:'Laki-laki seharusnya selalu menjadi pimpinan/atasan.',19:'Penting bagi laki-laki untuk berani mengambil risiko, meskipun ia bisa saja terluka.',20:'Ketika keadaan menjadi sulit, laki-laki harus menjadi lebih tangguh.',21:'Menurut saya, laki-laki muda sebaiknya berusaha tangguh secara fisik, meskipun tubuhnya tidak besar.'};
 const MRNI_ORDER=[1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21];
@@ -163,6 +165,7 @@ const PAGES=[
   {id:'usia',t:'num',l:'Usia',unit:'tahun',min:15,max:40},
   {id:'fak',t:'one',l:'Fakultas',o:[[1,'Fakultas Ilmu Sosial dan Ilmu Politik'],[2,'Fakultas Teknik']]},
   {id:'dept',t:'sel',l:'Departemen',show:()=>A.fak!=null,o:()=>DEPT[A.fak]||[]},
+  {id:'prodi',t:'sel',l:'Program studi',show:()=>(PRODI[A.dept]||[]).length>1,o:()=>PRODI[A.dept]||[]},
   {id:'angkatan',t:'sel',l:'Angkatan',o:[[2026,'2026'],[2025,'2025'],[2024,'2024'],[2023,'2023'],[2022,'2022'],[2021,'2021'],[2020,'2020'],[2019,'Sebelum 2020']]}]},
  {sec:1,title:'Keluarga',intro:'Pertanyaan berikut tentang orang yang membesarkan Anda.',items:[
   {id:'pend_ayah',t:'sel',l:'Pendidikan terakhir ayah',o:PEND},
@@ -251,7 +254,7 @@ document.getElementById('main').addEventListener('click',e=>{
  const b=e.target.closest('button[data-q]');if(!b)return;
  const q=b.dataset.q,v=Number(b.dataset.v);
  A[q]=v;
- if(q==='fak')delete A.dept;
+ if(q==='fak'){delete A.dept;delete A.prodi}
  if(q==='pengasuh'&&v!==4){delete A.hub_wali;delete A.pend_wali}
  if(q==='wawancara'&&v!==1)delete A.kontak;
  if(q==='teman'&&v!==1){for(const k of Object.keys(A))if(/^(inisial|lama_|kenal|frek|teman_ugm|mfq)/.test(k))delete A[k]}
@@ -266,6 +269,7 @@ document.getElementById('main').addEventListener('input',e=>{
  const f=e.target,q=f.dataset.q;if(!q)return;
  if(f.type==='number'||f.tagName==='SELECT'){A[q]=f.value===''?null:Number(f.value);if(A[q]==null)delete A[q]}
  else{A[q]=q==='inisial'?f.value.toUpperCase().replace(/[^A-Z]/g,''):f.value;if(q==='inisial')f.value=A[q]}
+ if(q==='dept'){delete A.prodi;const pr=PRODI[A.dept];if(pr&&pr.length===1)A.prodi=pr[0][0];save();render(true);return}
  mark();save();
 });
 async function send(status){
@@ -311,7 +315,7 @@ async function go(d){
 }
 document.getElementById('next').addEventListener('click',()=>go(1));
 document.getElementById('back').addEventListener('click',()=>go(-1));
-const VARS=()=>['consent','jk','aktif','usia','fak','dept','angkatan','pend_ayah','pend_ibu','pengasuh','hub_wali','pend_wali',...ASET.map((_,i)=>'aset'+p2(i+1)),'rumah','lantai','air','listrik',...Array.from({length:21},(_,i)=>'mrni'+p2(i+1)),'teman','inisial','lama_teman_th','lama_teman_bl','lama_dekat_th','lama_dekat_bl','kenal','frek','teman_ugm',...Array.from({length:30},(_,i)=>'mfq'+p2(i+1)),'wawancara'];
+const VARS=()=>['consent','jk','aktif','usia','fak','dept','prodi','angkatan','pend_ayah','pend_ibu','pengasuh','hub_wali','pend_wali',...ASET.map((_,i)=>'aset'+p2(i+1)),'rumah','lantai','air','listrik',...Array.from({length:21},(_,i)=>'mrni'+p2(i+1)),'teman','inisial','lama_teman_th','lama_teman_bl','lama_dekat_th','lama_dekat_bl','kenal','frek','teman_ugm',...Array.from({length:30},(_,i)=>'mfq'+p2(i+1)),'wawancara'];
 function rid(){if(!A.resp_id)A.resp_id='R'+Math.random().toString(36).slice(2,8).toUpperCase();return A.resp_id}
 function csv(){const v=['resp_id','t_mulai','t_selesai','durasi_detik',...VARS()];const dur=A.t_mulai&&A.t_selesai?Math.round((new Date(A.t_selesai)-new Date(A.t_mulai))/1000):'';const row=v.map(k=>k==='durasi_detik'?dur:k==='resp_id'?rid():(A[k]??''));return v.join(',')+'\n'+row.map(x=>/[",\n]/.test(String(x))?`"${String(x).replace(/"/g,'""')}"`:x).join(',')}
 function renderEnd(M){
@@ -347,7 +351,7 @@ document.getElementById('codes').addEventListener('change',e=>{document.body.cla
 document.getElementById('fill').addEventListener('click',()=>{
  const r=a=>a[Math.floor(Math.random()*a.length)];
  Object.assign(A,{consent:1,jk:1,aktif:1,usia:20+Math.floor(Math.random()*4),fak:r([1,2]),angkatan:r([2022,2023,2024,2025]),pend_ayah:r([4,6,7]),pend_ibu:r([4,5,6]),pengasuh:1,rumah:1,lantai:1,air:1,listrik:r([2,3,4]),teman:1,inisial:r(['AR','DF','RH','BS']),lama_teman_th:r([1,2,4]),lama_teman_bl:r([0,3,6]),lama_dekat_th:1,lama_dekat_bl:r([0,6]),kenal:r([1,2,3]),frek:r([3,4,5]),teman_ugm:1,wawancara:r([0,1]),t_mulai:A.t_mulai||new Date().toISOString()});
- A.dept=r(DEPT[A.fak])[0];
+ A.dept=r(DEPT[A.fak])[0];A.prodi=r(PRODI[A.dept])[0];
  ASET.forEach((_,i)=>A['aset'+p2(i+1)]=r([0,1,1]));
  for(let i=1;i<=21;i++)A['mrni'+p2(i)]=r([1,2,2,3,3,4,97]);
  for(let i=1;i<=30;i++)A['mfq'+p2(i)]=r([4,5,6,6,7,7,8]);
