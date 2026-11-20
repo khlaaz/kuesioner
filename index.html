@@ -132,10 +132,16 @@ textarea{width:100%;min-height:140px;margin-top:14px;font:12px/1.5 ui-monospace,
 /* ===== PENGATURAN =====
    ENDPOINT : URL Web App Apps Script (kosong = mode pratinjau, jawaban tidak dikirim)
    TOKEN    : harus sama dengan TOKEN di Code.gs (penyaring bot, bukan rahasia)
-   GELOMBANG: 'pilot' saat uji coba, ganti 'utama' saat pengumpulan data */
-const CONFIG={ENDPOINT:'',TOKEN:'ganti-dengan-kata-acak',GELOMBANG:'pilot',VERSI:'v2-2026-11-20'};
+   GELOMBANG: 'pilot' saat uji coba, ganti 'utama' saat pengumpulan data
+   WAJIB_KODE: true = hanya bisa diisi lewat link pribadi berkode (…/#K7F2QX); samakan dengan Code.gs
+   Link uji: …/#uji (alat uji tampil) atau …/#uji-KODE (alat uji + kode) */
+const CONFIG={ENDPOINT:'',TOKEN:'ganti-dengan-kata-acak',GELOMBANG:'pilot',VERSI:'v2-2026-11-20',WAJIB_KODE:true};
 const LIVE=!!CONFIG.ENDPOINT;
-const UJI=!LIVE||location.hash==='#uji';
+const HASH=location.hash.slice(1).split('-');
+const HASH_UJI=HASH.some(x=>x.toLowerCase()==='uji');
+const KODE=(HASH.find(x=>/^[A-Za-z0-9]{6}$/.test(x))||'').toUpperCase();
+const UJI=!LIVE||HASH_UJI;
+let GATE=null;
 const KEY='kuesioner-skripsi-v2';
 let A={},cur=0;
 const PEND=[[1,'Tidak sekolah'],[2,'SD sederajat'],[3,'SMP sederajat'],[4,'SMA/SMK sederajat'],[5,'D1–D3'],[6,'D4/S1'],[7,'S2'],[8,'S3'],[98,'Tidak tahu'],[99,'Tidak berlaku (meninggal atau tidak pernah hadir)']];
@@ -219,6 +225,7 @@ function qhtml(it,i){
 const order=()=>PAGES.map((p,i)=>i).filter(i=>vis(PAGES[i]));
 function render(keepScroll){
  const M=document.getElementById('main'),y=scrollY;
+ if(GATE){renderGate(M);return}
  if(A._end){renderEnd(M);return}
  const p=PAGES[cur],its=items(p);
  M.innerHTML=`${p.mfq?`<div class="remind">Masih tentang ${ini()}, teman yang Anda bayangkan.</div>`:''}<h2>${fill(p.title)}</h2>${p.intro?`<p class="intro">${fill(p.intro)}</p>`:''}${p.card?`<div class="card">${p.card}</div>`:''}${p.mfq?`<div class="legend"><span><b>0</b> Tidak pernah</span><span><b>2</b> Jarang</span><span><b>4</b> Kadang-kadang</span><span><b>6</b> Cukup sering</span><span><b>8</b> Selalu</span></div>`:''}${p.scale4?`<p class="legend">Jika tidak ingin menjawab sebuah pernyataan, pilih “Tidak ingin menjawab” di bawahnya.</p>`:''}${its.map(qhtml).join('')}<p class="msg" id="msg" hidden></p>`;
@@ -265,7 +272,7 @@ async function send(status){
  const data={resp_id:rid(),t_mulai:A.t_mulai||'',t_selesai:A.t_selesai||''};
  if(status==='selesai'){data.durasi_detik=A.t_mulai?Math.round((new Date(A.t_selesai)-new Date(A.t_mulai))/1000):'';for(const k of VARS())data[k]=A[k]??''}
  if(status==='kriteria'){data.jk=A.jk??'';data.aktif=A.aktif??''}
- const body=JSON.stringify({token:CONFIG.TOKEN,versi:CONFIG.VERSI,gelombang:location.hash==='#uji'?'uji':CONFIG.GELOMBANG,status,data,kontak:status==='selesai'&&A.wawancara===1?(A.kontak||''):''});
+ const body=JSON.stringify({token:CONFIG.TOKEN,kode:A.kode||KODE||'',versi:CONFIG.VERSI,gelombang:HASH_UJI?'uji':CONFIG.GELOMBANG,status,data,kontak:status==='selesai'&&A.wawancara===1?(A.kontak||''):''});
  const r=await fetch(CONFIG.ENDPOINT,{method:'POST',body});
  const j=await r.json();
  if(!j.ok)throw new Error(j.err||'gagal');
@@ -291,7 +298,7 @@ async function go(d){
     nb.disabled=true;nb.textContent='Mengirim…';m.hidden=true;
     try{await send('selesai')}catch(e){
      nb.disabled=false;nb.textContent='Kirim lagi';m.hidden=false;
-     m.textContent='Jawaban belum terkirim. Periksa koneksi internet, lalu tekan Kirim lagi. Jawaban Anda tetap tersimpan di perangkat ini.';
+     m.textContent=e.message==='dipakai'?'Kode undangan pada link Anda sudah dipakai untuk mengirim jawaban, jadi jawaban ini tidak bisa dikirim lagi.':e.message==='kode'?'Kode undangan pada link Anda tidak dikenal. Buka kembali link pribadi dari undangan Anda.':'Jawaban belum terkirim. Periksa koneksi internet, lalu tekan Kirim lagi. Jawaban Anda tetap tersimpan di perangkat ini.';
      return;
     }
     nb.disabled=false;
@@ -317,10 +324,21 @@ function renderEnd(M){
  M.innerHTML=`<div class="end"><h2>${t[0]}</h2><p class="intro">${t[1]}</p>${A._end==='selesai'?`<p class="intro">Kode responden Anda: <b>${rid()}</b>. Simpan kode ini jika suatu saat ingin menarik jawaban Anda dari penelitian.</p>`:''}${A._end==='selesai'&&UJI?`<div class="card"><p><b>Untuk peneliti (uji coba).</b> Satu baris data sesuai codebook. Kontak wawancara tidak ikut di baris ini.</p><dl class="kv"><dt>Kode responden</dt><dd>${rid()}</dd><dt>Durasi pengisian</dt><dd>${dur!=null?dur+' menit':'–'}</dd><dt>Butir MRNI dijawab 97</dt><dd>${n97} dari 21</dd><dt>Pertemanan diisi</dt><dd>${A.teman===1?'Ya, tentang '+esc(A.inisial):'Tidak (lolos ke wawancara)'}</dd><dt>Bersedia wawancara</dt><dd>${A.wawancara===1?'Ya':'Tidak'}</dd></dl><div class="acts"><button class="btn" id="cpcsv" type="button">Salin baris CSV</button><button class="btn sec" id="cpjson" type="button">Salin JSON</button></div><textarea id="out" readonly hidden></textarea></div>`:''}${UJI?`<div class="acts"><button class="btn sec" id="again" type="button">Isi ulang dari awal</button></div>`:''}</div>`;
  save();
 }
+function renderGate(M){
+ const t={tanpa_kode:['Link belum lengkap','Kuesioner ini hanya bisa diisi lewat link pribadi yang dikirim kepada Anda. Buka kembali link dari undangan Anda, lengkap dengan kode di bagian akhirnya.'],salah:['Kode undangan tidak dikenal',`Kode <b>${esc(KODE)}</b> tidak ada dalam daftar undangan. Pastikan Anda membuka link persis seperti yang dikirim kepada Anda.`],dipakai:['Terima kasih, Anda sudah mengisi','Kode undangan ini sudah dipakai untuk mengirim jawaban. Setiap undangan hanya bisa dipakai satu kali.']}[GATE];
+ document.getElementById('steps').innerHTML='';document.getElementById('bar').hidden=true;
+ M.innerHTML=`<div class="end"><h2>${t[0]}</h2><p class="intro">${t[1]}</p><p class="note">Jika ada kendala, hubungi peneliti melalui kontak yang tercantum di undangan.</p></div>`;
+}
+async function cekKode(){
+ if(!LIVE||!CONFIG.WAJIB_KODE)return;
+ if(!KODE&&!A.kode){GATE='tanpa_kode';return}
+ if(A._end==='selesai')return;
+ try{const r=await fetch(CONFIG.ENDPOINT+'?kode='+encodeURIComponent(KODE||A.kode));const j=await r.json();if(j.kode==='dipakai')GATE='dipakai';if(j.kode==='tidak_dikenal')GATE='salah'}catch(e){}
+}
 async function copy(txt,btn){const out=document.getElementById('out');out.hidden=false;out.value=txt;try{await navigator.clipboard.writeText(txt);btn.textContent='Tersalin'}catch(e){out.select();btn.textContent='Pilih teks di bawah lalu salin'}}
 document.getElementById('main').addEventListener('click',e=>{
  if(e.target.id==='cpcsv')copy(csv(),e.target);
- if(e.target.id==='cpjson'){const o={resp_id:rid()};for(const k of Object.keys(A))if(!k.startsWith('_')&&k!=='kontak')o[k]=A[k];copy(JSON.stringify(o,null,1),e.target)}
+ if(e.target.id==='cpjson'){const o={resp_id:rid()};for(const k of Object.keys(A))if(!k.startsWith('_')&&k!=='kontak'&&k!=='kode')o[k]=A[k];copy(JSON.stringify(o,null,1),e.target)}
  if(e.target.id==='again')restart();
 });
 function restart(){A={};cur=0;document.getElementById('next').hidden=false;save();render()}
@@ -341,8 +359,11 @@ function start(d){
  try{const s=d&&d.A?d:JSON.parse(localStorage.getItem(KEY)||'null');if(s){A=s.A||{};cur=s.cur||0}}catch(e){}
  try{if(localStorage.getItem(KEY+'-codes')){document.getElementById('codes').checked=true;document.body.classList.add('codes')}}catch(e){}
  if(!PAGES[cur])cur=0;
+ if(KODE&&A.kode&&A.kode!==KODE){A={};cur=0}
+ if(KODE)A.kode=KODE;
  if(A._end)document.getElementById('next').hidden=true;
  render();
+ cekKode().then(()=>{if(GATE)render()});
 }
 window.claude?.hot?.snapshot?.(()=>({A,cur}));
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
