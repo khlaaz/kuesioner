@@ -60,18 +60,13 @@ Kalau terpaksa beralih ke quota sampling (kerangka sampel tidak didapat), set `W
 
 Kode khusus: `97` = tidak ingin menjawab (MRNI-SF), `98` = tidak tahu, `99` = tidak berlaku.
 
-Ke Stata: **File → Download → CSV** dari tab `jawaban`, lalu:
-
-```stata
-import delimited "jawaban.csv", clear
-mvdecode mrni*, mv(97=.a)
-mvdecode aset* listrik pend_*, mv(98=.b \ 99=.c)
-```
+Ke Stata: buka tab `jawaban`, **File → Download → CSV**, simpan sebagai `jawaban.csv` di folder yang sama dengan `stata/siapkan_data.do`, lalu jalankan `do siapkan_data.do`. Do-file itu membuang baris uji, mengubah 97/98/99 jadi missing berjenis (`.a`/`.b`/`.c`), memberi label nilai dan variabel, menghitung skor subskala MRNI-SF dan MFQ-FF, alfa Cronbach, indeks aset (PCA), lalu menyimpan `kuesioner_bersih.dta`. Bagian indeks aset dan pendidikan pengasuh masih draf.
 
 ## Catatan
 
 - **Mengubah `Code.gs` setelah deploy:** pilih **Terapkan → Kelola deployment → Edit (ikon pensil) → Versi: Versi baru**. URL tetap sama. Kalau hanya disimpan, perubahan tidak berlaku.
 - **Mengubah `index.html`:** edit langsung di GitHub. Halaman ikut berubah dalam 1–2 menit.
+- **Semua sel disimpan sebagai teks** (format `@`), supaya Sheets tidak mengubah kode undangan atau waktu menjadi angka/tanggal. Stata tetap membacanya sebagai angka saat impor CSV.
 - **Repo publik hanya berisi kode.** Data responden ada di Google Sheet pribadi. Jangan pernah mengunggah data ke repo.
 - **Token terlihat di kode halaman.** Fungsinya hanya menyaring kiriman iseng, bukan pengaman data. Penyaring yang sebenarnya adalah kode undangan.
 - **Tidak ada endpoint yang mengembalikan isi Sheet.** Orang yang tahu URL Apps Script hanya bisa menambah baris (dengan kode yang sah) atau mengecek apakah sebuah kode valid.

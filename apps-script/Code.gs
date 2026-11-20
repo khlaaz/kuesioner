@@ -115,7 +115,7 @@ function tulisKode_(ss, strata, jumlah) {
     pakai[k] = 1;
     baris.push([k, strata, BASE_URL + '#' + k, '', '']);
   }
-  sh.getRange(sh.getLastRow() + 1, 1, baris.length, 5).setValues(baris);
+  sh.getRange(sh.getLastRow() + 1, 1, baris.length, 5).setNumberFormat('@').setValues(baris);
   return baris.length;
 }
 
@@ -125,7 +125,7 @@ function cariKode_(ss, kode) {
   if (!sh || sh.getLastRow() < 2) return null;
   const v = sh.getRange(2, 1, sh.getLastRow() - 1, 5).getValues();
   for (let i = 0; i < v.length; i++) {
-    if (v[i][0] === kode) return { sh: sh, row: i + 2, status: v[i][3] };
+    if (String(v[i][0]) === kode) return { sh: sh, row: i + 2, status: v[i][3] };
   }
   return null;
 }
@@ -133,14 +133,14 @@ function cariKode_(ss, kode) {
 // Hanya status dan TANGGAL (tanpa jam) yang dicatat, supaya kode tidak bisa dicocokkan ke baris jawaban lewat waktu kirim.
 function tandaiKode_(u, status) {
   if (u.status === 'selesai') return;
-  u.sh.getRange(u.row, 4, 1, 2).setValues([[status, Utilities.formatDate(new Date(), ZONA, 'yyyy-MM-dd')]]);
+  u.sh.getRange(u.row, 4, 1, 2).setNumberFormat('@').setValues([[status, Utilities.formatDate(new Date(), ZONA, 'yyyy-MM-dd')]]);
 }
 
 function tab_(ss, name, head) {
   let sh = ss.getSheetByName(name);
   if (!sh) {
     sh = ss.insertSheet(name);
-    sh.getRange(1, 1, 1, head.length).setValues([head]);
+    sh.getRange(1, 1, 1, head.length).setNumberFormat('@').setValues([head]);
     sh.setFrozenRows(1);
   }
   return sh;
@@ -152,10 +152,12 @@ function tambah_(ss, name, obj) {
   const add = Object.keys(obj).filter(k => head.indexOf(k) < 0);
   if (add.length) {
     head = head.concat(add);
-    sh.getRange(1, 1, 1, head.length).setValues([head]);
+    sh.getRange(1, 1, 1, head.length).setNumberFormat('@').setValues([head]);
     sh.setFrozenRows(1);
   }
-  sh.appendRow(head.map(k => (obj[k] === undefined || obj[k] === null) ? '' : obj[k]));
+  // Format teks ('@') supaya Sheets tidak mengubah kode, tanggal, atau angka menjadi format lain.
+  sh.getRange(sh.getLastRow() + 1, 1, 1, head.length).setNumberFormat('@')
+    .setValues([head.map(k => (obj[k] === undefined || obj[k] === null) ? '' : String(obj[k]))]);
 }
 
 function ada_(ss, name, id) {
@@ -164,7 +166,7 @@ function ada_(ss, name, id) {
   const head = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
   const c = head.indexOf('resp_id');
   if (c < 0) return false;
-  return sh.getRange(2, c + 1, sh.getLastRow() - 1, 1).getValues().some(r => r[0] === id);
+  return sh.getRange(2, c + 1, sh.getLastRow() - 1, 1).getValues().some(r => String(r[0]) === String(id));
 }
 
 function out_(o) {
