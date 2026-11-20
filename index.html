@@ -163,8 +163,9 @@ const PAGES=[
   {id:'jk',t:'one',l:'Jenis kelamin',o:[[1,'Laki-laki'],[2,'Perempuan']]},
   {id:'aktif',t:'one',l:'Apakah Anda mahasiswa aktif program sarjana (S1) UGM pada semester ini?',o:YN},
   {id:'usia',t:'num',l:'Usia',unit:'tahun',min:15,max:40},
-  {id:'fak',t:'one',l:'Fakultas',o:[[1,'Fakultas Ilmu Sosial dan Ilmu Politik'],[2,'Fakultas Teknik']]},
-  {id:'dept',t:'sel',l:'Departemen',show:()=>A.fak!=null,o:()=>DEPT[A.fak]||[]},
+  {id:'fak',t:'one',l:'Fakultas',o:()=>[[1,'Fakultas Ilmu Sosial dan Ilmu Politik'],[2,'Fakultas Teknik']].concat(CONFIG.GELOMBANG==='pilot'?[[9,'Fakultas lain di UGM']]:[])},
+  {id:'fak_lain',t:'txt',l:'Nama fakultas Anda',min:2,show:()=>A.fak===9},
+  {id:'dept',t:'sel',l:'Departemen',show:()=>A.fak===1||A.fak===2,o:()=>DEPT[A.fak]||[]},
   {id:'prodi',t:'sel',l:'Program studi',show:()=>(PRODI[A.dept]||[]).length>1,o:()=>PRODI[A.dept]||[]},
   {id:'angkatan',t:'sel',l:'Angkatan',o:[[2026,'2026'],[2025,'2025'],[2024,'2024'],[2023,'2023'],[2022,'2022'],[2021,'2021'],[2020,'2020'],[2019,'Sebelum 2020']]}]},
  {sec:1,title:'Keluarga',intro:'Pertanyaan berikut tentang orang yang membesarkan Anda.',items:[
@@ -204,7 +205,7 @@ function answered(it){
  if(it.t==='grid')return ASET.every((_,i)=>A['aset'+p2(i+1)]!=null);
  if(it.t==='dur')return durOk(it.id);
  if(it.t==='ini')return /^[A-Za-z]{1,4}$/.test(A.inisial||'');
- if(it.t==='txt')return (A[it.id]||'').trim().length>4;
+ if(it.t==='txt')return (A[it.id]||'').trim().length>=(it.min||5);
  if(it.t==='num')return A[it.id]!=null&&A[it.id]>=it.min&&A[it.id]<=it.max;
  return A[it.id]!=null;
 }
@@ -254,7 +255,7 @@ document.getElementById('main').addEventListener('click',e=>{
  const b=e.target.closest('button[data-q]');if(!b)return;
  const q=b.dataset.q,v=Number(b.dataset.v);
  A[q]=v;
- if(q==='fak'){delete A.dept;delete A.prodi}
+ if(q==='fak'){delete A.dept;delete A.prodi;if(v!==9)delete A.fak_lain}
  if(q==='pengasuh'&&v!==4){delete A.hub_wali;delete A.pend_wali}
  if(q==='wawancara'&&v!==1)delete A.kontak;
  if(q==='teman'&&v!==1){for(const k of Object.keys(A))if(/^(inisial|lama_|kenal|frek|teman_ugm|mfq)/.test(k))delete A[k]}
@@ -315,7 +316,7 @@ async function go(d){
 }
 document.getElementById('next').addEventListener('click',()=>go(1));
 document.getElementById('back').addEventListener('click',()=>go(-1));
-const VARS=()=>['consent','jk','aktif','usia','fak','dept','prodi','angkatan','pend_ayah','pend_ibu','pengasuh','hub_wali','pend_wali',...ASET.map((_,i)=>'aset'+p2(i+1)),'rumah','lantai','air','listrik',...Array.from({length:21},(_,i)=>'mrni'+p2(i+1)),'teman','inisial','lama_teman_th','lama_teman_bl','lama_dekat_th','lama_dekat_bl','kenal','frek','teman_ugm',...Array.from({length:30},(_,i)=>'mfq'+p2(i+1)),'wawancara'];
+const VARS=()=>['consent','jk','aktif','usia','fak','fak_lain','dept','prodi','angkatan','pend_ayah','pend_ibu','pengasuh','hub_wali','pend_wali',...ASET.map((_,i)=>'aset'+p2(i+1)),'rumah','lantai','air','listrik',...Array.from({length:21},(_,i)=>'mrni'+p2(i+1)),'teman','inisial','lama_teman_th','lama_teman_bl','lama_dekat_th','lama_dekat_bl','kenal','frek','teman_ugm',...Array.from({length:30},(_,i)=>'mfq'+p2(i+1)),'wawancara'];
 function rid(){if(!A.resp_id)A.resp_id='R'+Math.random().toString(36).slice(2,8).toUpperCase();return A.resp_id}
 function csv(){const v=['resp_id','t_mulai','t_selesai','durasi_detik',...VARS()];const dur=A.t_mulai&&A.t_selesai?Math.round((new Date(A.t_selesai)-new Date(A.t_mulai))/1000):'';const row=v.map(k=>k==='durasi_detik'?dur:k==='resp_id'?rid():(A[k]??''));return v.join(',')+'\n'+row.map(x=>/[",\n]/.test(String(x))?`"${String(x).replace(/"/g,'""')}"`:x).join(',')}
 function renderEnd(M){

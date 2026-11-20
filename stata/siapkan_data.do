@@ -44,7 +44,7 @@ mvdecode pend_ayah pend_ibu pend_wali aset* listrik, mv(98 = .b \ 99 = .c)
 * --- 4. Label nilai --------------------------------------------------------
 label define yn       0 "Tidak" 1 "Ya"
 label define jk       1 "Laki-laki" 2 "Perempuan"
-label define fak      1 "FISIPOL" 2 "Teknik"
+label define fak      1 "FISIPOL" 2 "Teknik" 9 "Fakultas lain (khusus pilot)"
 label define dept     101 "Sosiologi" 102 "Ilmu Komunikasi" 103 "Ilmu Hubungan Internasional" ///
                       104 "Manajemen dan Kebijakan Publik" 105 "Politik dan Pemerintahan"     ///
                       106 "Pembangunan Sosial dan Kesejahteraan"                               ///
@@ -101,6 +101,7 @@ label var jk          "Jenis kelamin"
 label var aktif       "Mahasiswa S1 aktif UGM"
 label var usia        "Usia (tahun)"
 label var fak         "Fakultas"
+label var fak_lain    "Nama fakultas lain (khusus pilot)"
 label var dept        "Departemen (strata sampling)"
 label var prodi       "Program studi (otomatis bila departemen hanya punya satu prodi)"
 label var angkatan    "Angkatan"
