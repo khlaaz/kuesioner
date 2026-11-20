@@ -361,7 +361,7 @@ document.getElementById('fill').addEventListener('click',()=>{
 function start(d){
  if(UJI){document.getElementById('tools').hidden=false;document.getElementById('sub').textContent+=LIVE?' Mode uji: jawaban tetap terkirim.':' Pratinjau: jawaban tidak dikirim ke mana pun.'}
  try{const s=d&&d.A?d:JSON.parse(localStorage.getItem(KEY)||'null');if(s){A=s.A||{};cur=s.cur||0}}catch(e){}
- try{if(localStorage.getItem(KEY+'-codes')){document.getElementById('codes').checked=true;document.body.classList.add('codes')}}catch(e){}
+ try{if(UJI&&localStorage.getItem(KEY+'-codes')){document.getElementById('codes').checked=true;document.body.classList.add('codes')}}catch(e){}
  if(!PAGES[cur])cur=0;
  if(KODE&&A.kode&&A.kode!==KODE){A={};cur=0}
  if(KODE)A.kode=KODE;
