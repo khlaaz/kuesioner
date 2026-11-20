@@ -15,7 +15,7 @@
 
 // Harus sama persis dengan CONFIG.TOKEN di index.html.
 // Ini hanya penyaring kiriman iseng/bot, bukan rahasia: token terlihat di kode halaman.
-const TOKEN = 'ganti-dengan-kata-acak';
+const TOKEN = 'kuesioner-du5xjttowv';
 
 // true = jawaban hanya diterima dari link berkode yang ada di tab undangan, dan tiap kode sekali pakai.
 // Samakan dengan CONFIG.WAJIB_KODE di index.html.
