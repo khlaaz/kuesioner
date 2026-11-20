@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuesioner Pertemanan Laki-laki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday research instrument: calm, clear, respectful of the respondent
+   IDEA a printed field-survey booklet answered with a ballpoint pen; the item you are on is highlighted with a marker
+   PICTURE the form itself: one calm column of items, answer bubbles that fill with pen ink
+   COLOUR white paper, near-black ink, ballpoint blue for answers, marker yellow for the current item
+   TYPE Plus Jakarta Sans (an Indonesian typeface) for everything
+   LAYOUT modest title + section strip on top, one 720px column of items, sticky back/next bar at the bottom */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#121419);--ink:light-dark(#17181c,#eceef3);--mute:light-dark(#5b5f69,#a4a9b5);--line:light-dark(#d8dbe1,#2e323b);--soft:light-dark(#f4f5f8,#1a1d24);--pen:light-dark(#1d3fcf,#90a8ff);--penbg:light-dark(#e9eeff,#1f2747);--hl:light-dark(#fff0a0,#4d4520);--err:light-dark(#c3261f,#ff8f86)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 "Plus Jakarta Sans",system-ui,sans-serif;overflow-x:clip}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 max(16px,4vw)}
+header{border-bottom:1px solid var(--line);padding:28px 0 0}
+h1{font-size:clamp(28px,5vw,40px);line-height:1.08;letter-spacing:-.02em;font-weight:800;margin:0 0 6px;text-wrap:balance}
+.sub{color:var(--mute);margin:0 0 14px;font-size:15px}
+.tools{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:14px;color:var(--mute);margin-bottom:18px}
+.tools label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.tools input{width:18px;height:18px;accent-color:var(--pen)}
+.ghost{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;color:var(--mute)}
+.ghost:hover{border-color:var(--pen);color:var(--pen)}
+.steps{display:flex;gap:4px;overflow-x:auto;padding-bottom:12px}
+.step{flex:1 0 auto;font-size:13px;color:var(--mute);padding-top:8px;border-top:4px solid var(--line);white-space:nowrap}
+.step.done{border-color:var(--pen);color:var(--ink)}
+.step.cur{border-color:var(--pen);color:var(--pen);font-weight:600}
+main.wrap{padding-top:28px;padding-bottom:140px}
+h2{font-size:24px;line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+.intro{margin:0 0 22px;color:var(--mute);max-width:65ch}
+.intro b,.remind b{color:var(--ink)}
+.card{background:var(--soft);border-radius:12px;padding:18px 20px;margin-bottom:22px}
+.card p{margin:0 0 10px}.card ul{margin:0 0 10px;padding-left:20px}.card p:last-child,.card ul:last-child{margin-bottom:0}
+.remind{position:sticky;top:0;z-index:3;background:var(--penbg);color:var(--ink);border-radius:10px;padding:10px 14px;margin:0 0 20px;font-size:15px;box-shadow:0 0 0 6px var(--bg)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px;color:var(--mute);margin:-8px 0 18px}
+.legend span b{color:var(--pen)}
+.q{padding:18px 0 20px;border-top:1px solid var(--line);scroll-margin-top:70px}
+.q.now .qn{background:var(--hl)}
+.q.miss .ql{color:var(--err)}
+.q.miss .qt::after{content:"Belum dijawab";display:block;font-size:13px;font-weight:600}
+.ql{display:flex;gap:10px;margin-bottom:12px;font-weight:500}
+.qn{flex:none;font-size:14px;font-weight:600;color:var(--mute);padding:1px 6px;border-radius:4px;height:fit-content;font-variant-numeric:tabular-nums}
+.qt{flex:1}
+.qt em{font-style:normal;font-weight:700;color:var(--pen)}
+.vc{display:none;font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--pen);background:var(--penbg);padding:2px 6px;border-radius:4px;height:fit-content;flex:none}
+.codes .vc{display:inline-block}
+.help{font-size:14px;color:var(--mute);margin:-6px 0 12px 0}
+.opts{display:grid;gap:8px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;min-height:46px;padding:10px 14px;background:var(--bg);border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.opt::before{content:"";flex:none;width:20px;height:20px;border-radius:50%;border:2px solid var(--mute)}
+.opt:hover{border-color:var(--pen)}
+.opt.on{border-color:var(--pen);background:var(--penbg)}
+.opt.on::before{border-color:var(--pen);background:radial-gradient(circle,var(--pen) 0 5px,transparent 6px)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+.s4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.sc{min-height:52px;padding:8px 4px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer;font-size:14px;line-height:1.25}
+.sc:hover{border-color:var(--pen)}
+.sc.on{background:var(--pen);border-color:var(--pen);color:var(--bg);font-weight:600}
+.opt97{margin-top:8px;display:flex;justify-content:flex-end}
+.opt97 button{background:none;border:1px dashed var(--line);border-radius:8px;padding:8px 12px;font-size:14px;color:var(--mute);cursor:pointer;min-height:40px}
+.opt97 button.on{border-style:solid;border-color:var(--pen);color:var(--pen);background:var(--penbg);font-weight:600}
+.s9{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px}
+.s9 .sc{min-height:46px;font-size:16px;font-variant-numeric:tabular-nums}
+.anch{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;margin-top:6px;font-size:13px;line-height:1.2;color:var(--mute)}
+.anch span{text-align:center}
+.anch .a0{grid-column:1/3;text-align:left}.anch .a2{grid-column:3}.anch .a4{grid-column:4/7}.anch .a6{grid-column:7}.anch .a8{grid-column:8/10;text-align:right}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;max-width:420px}
+.row3{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:center;padding:10px 0;border-top:1px dashed var(--line)}
+.row3:first-child{border-top:0}
+.row3.miss .rl{color:var(--err);font-weight:600}
+.row3 .seg{width:min(300px,52vw)}
+.row3 .sc{min-height:44px}
+input[type=text],input[type=number],select{width:100%;max-width:340px;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:16px}
+input:focus,select:focus{border-color:var(--pen)}
+.dur{display:flex;flex-wrap:wrap;gap:10px}
+.dur label{display:flex;align-items:center;gap:8px}
+.dur input{width:96px}
+.ini{text-transform:uppercase;letter-spacing:.08em;font-weight:700;max-width:160px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-top:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:12px;padding-top:12px;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.prog{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--pen);transition:width .3s}
+.pct{font-size:13px;color:var(--mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+.btn{min-height:46px;padding:10px 22px;border-radius:10px;border:1px solid var(--pen);background:var(--pen);color:var(--bg);font-weight:600;cursor:pointer;white-space:nowrap}
+.btn.sec{background:none;color:var(--pen)}
+.btn[hidden],.tools[hidden]{display:none}
+.btn:disabled{opacity:.6;cursor:wait}
+.msg{color:var(--err);font-size:14px;font-weight:600;margin:16px 0 0}
+.end{padding-top:12px}
+.end h2{font-size:clamp(28px,5vw,40px);line-height:1.08}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;margin:18px 0;font-size:15px}
+.kv dt{color:var(--mute)}.kv dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+.acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+textarea{width:100%;min-height:140px;margin-top:14px;font:12px/1.5 ui-monospace,Menlo,monospace;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)}
+.note{font-size:13px;color:var(--mute);margin-top:16px}
+@media(max-width:560px){.anch .a2,.anch .a4,.anch .a6{display:none}.anch .a0{grid-column:1/5}.anch .a8{grid-column:6/10}.s9{gap:3px}.s9 .sc{font-size:15px;padding:8px 0}.row3{grid-template-columns:minmax(0,1fr)}.row3 .seg{width:100%}.sc{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.prog i{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Pertemanan dan pandangan tentang laki-laki</h1>
+    <p class="sub" id="sub">Kuesioner skripsi, Departemen Sosiologi FISIPOL UGM.</p>
+    <div class="tools" id="tools" hidden>
+      <label for="codes"><input type="checkbox" id="codes"> Tampilkan kode variabel</label>
+      <button class="ghost" id="fill" type="button">Isi acak (uji)</button>
+      <button class="ghost" id="reset" type="button">Mulai ulang</button>
+    </div>
+    <div class="steps" id="steps"></div>
+  </div>
+</header>
+<main class="wrap" id="main"></main>
+<div class="bar" id="bar">
+  <div class="wrap">
+    <button class="btn sec" id="back" type="button">Kembali</button>
+    <div class="prog" aria-hidden="true"><i id="progi"></i></div>
+    <span class="pct" id="pct"></span>
+    <button class="btn" id="next" type="button">Lanjut</button>
+  </div>
+</div>
+<script>
+{
+/* ===== PENGATURAN =====
+   ENDPOINT : URL Web App Apps Script (kosong = mode pratinjau, jawaban tidak dikirim)
+   TOKEN    : harus sama dengan TOKEN di Code.gs (penyaring bot, bukan rahasia)
+   GELOMBANG: 'pilot' saat uji coba, ganti 'utama' saat pengumpulan data */
+const CONFIG={ENDPOINT:'',TOKEN:'ganti-dengan-kata-acak',GELOMBANG:'pilot',VERSI:'v2-2026-11-20'};
+const LIVE=!!CONFIG.ENDPOINT;
+const UJI=!LIVE||location.hash==='#uji';
+const KEY='kuesioner-skripsi-v2';
+let A={},cur=0;
+const PEND=[[1,'Tidak sekolah'],[2,'SD sederajat'],[3,'SMP sederajat'],[4,'SMA/SMK sederajat'],[5,'D1–D3'],[6,'D4/S1'],[7,'S2'],[8,'S3'],[98,'Tidak tahu'],[99,'Tidak berlaku (meninggal atau tidak pernah hadir)']];
+const DEPT={1:[[101,'Sosiologi'],[102,'Ilmu Komunikasi'],[103,'Ilmu Hubungan Internasional'],[104,'Manajemen dan Kebijakan Publik'],[105,'Politik dan Pemerintahan'],[106,'Pembangunan Sosial dan Kesejahteraan']],2:[[201,'Teknik Sipil dan Lingkungan'],[202,'Teknik Arsitektur dan Perencanaan'],[203,'Teknik Mesin dan Industri'],[204,'Teknik Elektro dan Teknologi Informasi'],[205,'Teknik Kimia'],[206,'Teknik Geodesi'],[207,'Teknik Geologi'],[208,'Teknik Nuklir dan Teknik Fisika']]};
+const ASET=['Tabung gas 5,5 kg atau lebih','Lemari es/kulkas','AC','Pemanas air (water heater)','Komputer/laptop','Televisi layar datar minimal 30 inci','Emas/perhiasan minimal 10 gram','Sepeda motor','Mobil','Lahan (selain yang ditempati rumah)','Rumah lain selain yang ditempati'];
+const MRNI={1:'Laki-laki tidak boleh mengakui ketika orang lain menyakiti perasaannya.',2:'Laki-laki seharusnya tidak terbawa perasaan dalam situasi yang penuh emosi.',3:'Laki-laki seharusnya tidak terlalu cepat menunjukkan kepada orang lain bahwa ia peduli kepada mereka.',4:'Laki-laki seharusnya memiliki keterampilan pertukangan untuk memperbaiki rumah.',5:'Laki-laki seharusnya mampu memperbaiki sebagian besar barang di rumah.',6:'Laki-laki seharusnya tahu cara memperbaiki kendaraannya sendiri jika mogok.',7:'Kaum homoseksual tidak boleh menikah.',8:'Tidak seharusnya ada tempat berkumpul khusus kaum homoseksual.',9:'Kaum homoseksual tidak boleh berciuman di tempat umum.',10:'Laki-laki seharusnya menonton pertandingan olahraga seperti sepak bola, bukan sinetron/drama.',11:'Laki-laki seharusnya lebih memilih menonton film laga daripada membaca novel romantis.',12:'Anak laki-laki seharusnya lebih memilih bermain mobil-mobilan daripada boneka.',13:'Laki-laki seharusnya selalu suka berhubungan seks.',14:'Laki-laki tidak seharusnya menolak ajakan berhubungan seks.',15:'Laki-laki seharusnya selalu siap untuk berhubungan seks.',16:'Presiden Indonesia seharusnya selalu laki-laki.',17:'Laki-laki seharusnya menjadi pemimpin dalam kelompok apa pun.',18:'Laki-laki seharusnya selalu menjadi pimpinan/atasan.',19:'Penting bagi laki-laki untuk berani mengambil risiko, meskipun ia bisa saja terluka.',20:'Ketika keadaan menjadi sulit, laki-laki harus menjadi lebih tangguh.',21:'Menurut saya, laki-laki muda sebaiknya berusaha tangguh secara fisik, meskipun tubuhnya tidak besar.'};
+const MRNI_ORDER=[1,4,7,10,13,16,19,2,5,8,11,14,17,20,3,6,9,12,15,18,21];
+const MFQ=['[i] membantu saya ketika saya membutuhkannya.','[i] akan membuat saya merasa nyaman dalam situasi yang baru.','[i] adalah tempat saya bisa menceritakan hal-hal pribadi.','[i] punya ide bagus tentang kegiatan seru untuk dilakukan.','[i] akan tetap ingin berteman dengan saya meskipun kami tidak bertemu selama beberapa bulan.','[i] membuat saya merasa pintar.','[i] membuat saya tertawa.','[i] tahu ketika suasana hati saya sedang buruk.','[i] membantu saya mengerjakan sesuatu.','[i] menyebutkan hal-hal yang saya kuasai dengan baik.','Akan baik jika [i] ada di dekat saya saat saya sedang takut.','[i] akan tetap ingin berteman dengan saya meskipun kami bertengkar.','[i] meminjamkan barang yang saya butuhkan.','[i] akan membuat saya merasa lebih baik jika saya sedang khawatir.','[i] adalah tempat saya bisa menceritakan rahasia.','[i] akan tetap berteman dengan saya meskipun orang lain mengkritik saya.','[i] memuji saya ketika saya melakukan sesuatu dengan baik.','[i] menyenangkan untuk diajak mengobrol.','[i] membuat saya merasa istimewa.','[i] akan tetap berteman dengan saya meskipun orang lain tidak menyukai saya.','[i] tahu ketika ada sesuatu yang mengganggu pikiran saya.','[i] seru untuk diajak menghabiskan waktu bersama.','[i] akan membuat saya merasa lebih tenang jika saya sedang gugup.','[i] membantu saya ketika saya sedang berusaha keras menyelesaikan sesuatu.','[i] membuat saya merasa mampu melakukan sesuatu dengan baik.','[i] akan tetap ingin berteman dengan saya meskipun kami berselisih paham.','[i] menunjukkan kepada saya cara melakukan sesuatu dengan lebih baik.','[i] asyik diajak duduk santai dan mengobrol.','[i] mudah diajak bicara tentang hal-hal pribadi.','[i] membuat saya merasa lebih baik ketika suasana hati saya sedang buruk.'];
+const p2=n=>String(n).padStart(2,'0');
+const YN=[[1,'Ya'],[0,'Tidak']];
+const SECS=['Persetujuan','Tentang Anda','Rumah','Pandangan','Teman','Wawancara'];
+const hasTeman=()=>A.teman===1;
+const PAGES=[
+ {sec:0,title:'Persetujuan partisipasi',card:`<p>Anda diundang mengikuti penelitian skripsi tentang pertemanan antarlaki-laki dan pandangan mengenai peran laki-laki di kalangan mahasiswa Universitas Gadjah Mada. Penelitian ini dilakukan oleh Ikhlas Marta Dharma, mahasiswa Departemen Sosiologi FISIPOL UGM, di bawah bimbingan Amelia Maika.</p><p>Pengisian memerlukan waktu sekitar 15–20 menit. Anda akan menjawab pertanyaan tentang latar belakang keluarga, pandangan Anda mengenai laki-laki, dan pertemanan Anda dengan satu teman laki-laki.</p><ul><li>Partisipasi bersifat sukarela. Anda boleh berhenti kapan saja tanpa konsekuensi apa pun.</li><li>Tidak ada jawaban benar atau salah. Untuk pernyataan yang tidak ingin Anda jawab, tersedia pilihan “Tidak ingin menjawab”.</li><li>Kuesioner tidak meminta nama Anda. Jawaban dianalisis secara agregat dan hanya digunakan untuk keperluan penelitian.</li><li>Kontak hanya diminta jika Anda bersedia diwawancarai, dan disimpan terpisah dari jawaban.</li></ul>`,
+  items:[{id:'consent',t:'one',l:'Apakah Anda bersedia berpartisipasi dalam penelitian ini?',o:[[1,'Ya, saya bersedia'],[0,'Tidak']]}]},
+ {sec:1,title:'Tentang Anda',items:[
+  {id:'jk',t:'one',l:'Jenis kelamin',o:[[1,'Laki-laki'],[2,'Perempuan']]},
+  {id:'aktif',t:'one',l:'Apakah Anda mahasiswa aktif program sarjana (S1) UGM pada semester ini?',o:YN},
+  {id:'usia',t:'num',l:'Usia',unit:'tahun',min:15,max:40},
+  {id:'fak',t:'one',l:'Fakultas',o:[[1,'Fakultas Ilmu Sosial dan Ilmu Politik'],[2,'Fakultas Teknik']]},
+  {id:'dept',t:'sel',l:'Departemen',show:()=>A.fak!=null,o:()=>DEPT[A.fak]||[]},
+  {id:'angkatan',t:'sel',l:'Angkatan',o:[[2026,'2026'],[2025,'2025'],[2024,'2024'],[2023,'2023'],[2022,'2022'],[2021,'2021'],[2020,'2020'],[2019,'Sebelum 2020']]}]},
+ {sec:1,title:'Keluarga',intro:'Pertanyaan berikut tentang orang yang membesarkan Anda.',items:[
+  {id:'pend_ayah',t:'sel',l:'Pendidikan terakhir ayah',o:PEND},
+  {id:'pend_ibu',t:'sel',l:'Pendidikan terakhir ibu',o:PEND},
+  {id:'pengasuh',t:'one',l:'Sebagian besar masa kecil hingga SMA, Anda dibesarkan oleh siapa?',o:[[1,'Ayah dan ibu'],[2,'Ayah saja'],[3,'Ibu saja'],[4,'Wali (bukan ayah atau ibu kandung)']]},
+  {id:'hub_wali',t:'one',l:'Apa hubungan Anda dengan wali tersebut?',show:()=>A.pengasuh===4,o:[[1,'Kakek/nenek'],[2,'Paman/bibi'],[3,'Kakak'],[4,'Ayah atau ibu tiri'],[5,'Lainnya']]},
+  {id:'pend_wali',t:'sel',l:'Pendidikan terakhir wali',show:()=>A.pengasuh===4,o:PEND.slice(0,9)}]},
+ {sec:2,title:'Rumah keluarga',intro:'Pertanyaan berikut tentang <b>rumah keluarga tempat Anda dibesarkan</b>, bukan kos atau tempat tinggal selama kuliah.',items:[
+  {id:'aset',t:'grid',l:'Apakah rumah tangga keluarga Anda memiliki barang berikut?'},
+  {id:'rumah',t:'sel',l:'Status kepemilikan rumah',o:[[1,'Milik sendiri'],[2,'Kontrak atau sewa'],[3,'Bebas sewa'],[4,'Rumah dinas'],[5,'Lainnya']]},
+  {id:'lantai',t:'sel',l:'Jenis lantai terluas',o:[[1,'Keramik, marmer, atau granit'],[2,'Ubin atau tegel'],[3,'Semen'],[4,'Kayu atau papan'],[5,'Tanah'],[6,'Lainnya']]},
+  {id:'air',t:'sel',l:'Sumber air minum utama',o:[[1,'Air kemasan atau isi ulang'],[2,'Ledeng'],[3,'Sumur bor atau pompa'],[4,'Sumur terlindung'],[5,'Lainnya']]},
+  {id:'listrik',t:'sel',l:'Daya listrik terpasang (PLN)',o:[[1,'450 VA'],[2,'900 VA'],[3,'1.300 VA'],[4,'2.200 VA'],[5,'Lebih dari 2.200 VA'],[98,'Tidak tahu']]}]},
+ ...[MRNI_ORDER.slice(0,11),MRNI_ORDER.slice(11)].map((g,k)=>({sec:3,title:'Pandangan tentang laki-laki',scale4:1,intro:'Berikut beberapa pernyataan tentang laki-laki. Pilih jawaban yang paling sesuai dengan pendapat Anda. Tidak ada jawaban benar atau salah.',items:g.map((n,j)=>({id:'mrni'+p2(n),t:'s4',l:MRNI[n],num:k*11+j+1}))})),
+ {sec:4,title:'Teman dekat Anda',items:[
+  {id:'teman',t:'one',l:'Apakah saat ini Anda memiliki setidaknya satu teman dekat laki-laki?',o:YN},
+  {id:'inisial',t:'ini',l:'Bayangkan satu teman laki-laki yang paling dekat dengan Anda saat ini, bukan saudara kandung dan bukan pasangan. Tuliskan inisialnya saja.',show:hasTeman,help:'Semua pertanyaan berikutnya tentang orang yang sama ini. Mohon tetap membayangkan dia sampai bagian pertemanan selesai.'},
+  {id:'lama_teman',t:'dur',l:'Sudah berapa lama Anda berteman dengan [i]?',show:hasTeman},
+  {id:'lama_dekat',t:'dur',l:'Sudah berapa lama Anda menganggap [i] sebagai teman terdekat?',show:hasTeman},
+  {id:'kenal',t:'one',l:'Di mana Anda pertama kali berkenalan dengan [i]?',show:hasTeman,o:[[1,'Kampus'],[2,'SMA atau sekolah sebelumnya'],[3,'Kos atau lingkungan tempat tinggal'],[4,'Organisasi atau komunitas'],[5,'Lainnya']]},
+  {id:'frek',t:'one',l:'Seberapa sering Anda bertemu atau berkomunikasi dengan [i]?',show:hasTeman,o:[[5,'Hampir setiap hari'],[4,'Beberapa kali seminggu'],[3,'Sekali seminggu'],[2,'Beberapa kali sebulan'],[1,'Jarang']]},
+  {id:'teman_ugm',t:'one',l:'Apakah [i] mahasiswa UGM?',show:hasTeman,o:YN}]},
+ ...[0,1,2].map(k=>({sec:4,title:'Seperti apa [i] sebagai teman',mfq:1,show:hasTeman,intro:k===0?'Untuk setiap butir, pilih angka yang menunjukkan <b>seberapa sering</b> [i] bersikap atau melakukan apa yang disebutkan. Tidak ada jawaban benar atau salah karena setiap pertemanan berbeda. Gambarkan [i] apa adanya bagi Anda.':'',items:MFQ.slice(k*10,k*10+10).map((s,j)=>({id:'mfq'+p2(k*10+j+1),t:'s9',l:s,num:k*10+j+1}))})),
+ {sec:5,title:'Wawancara lanjutan',intro:'Peneliti akan mewawancarai sebagian kecil responden untuk memahami lebih dalam pengalaman pertemanan dan latar belakang keluarga. Kesediaan ini tidak mengikat, dan tidak semua yang bersedia akan dihubungi.',items:[
+  {id:'wawancara',t:'one',l:'Apakah Anda bersedia dihubungi di kemudian hari untuk wawancara?',o:YN},
+  {id:'kontak',t:'txt',l:'Tuliskan nomor WhatsApp atau surel yang bisa dihubungi',show:()=>A.wawancara===1,help:'Kontak disimpan terpisah dari jawaban kuesioner.'}]}
+];
+const ini=()=>`<em>${esc(A.inisial||'teman Anda')}</em>`;
+const fill=s=>s.replace(/\[i\]/g,ini());
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const vis=p=>!p.show||p.show();
+const items=p=>p.items.filter(vis);
+const opts=it=>typeof it.o==='function'?it.o():it.o;
+const durOk=k=>A[k+'_th']!=null&&A[k+'_bl']!=null;
+function answered(it){
+ if(it.t==='grid')return ASET.every((_,i)=>A['aset'+p2(i+1)]!=null);
+ if(it.t==='dur')return durOk(it.id);
+ if(it.t==='ini')return /^[A-Za-z]{1,4}$/.test(A.inisial||'');
+ if(it.t==='txt')return (A[it.id]||'').trim().length>4;
+ if(it.t==='num')return A[it.id]!=null&&A[it.id]>=it.min&&A[it.id]<=it.max;
+ return A[it.id]!=null;
+}
+function ctl(it){
+ const v=A[it.id];
+ if(it.t==='one')return `<div class="opts" role="radiogroup">${opts(it).map(([c,l])=>`<button type="button" class="opt${v===c?' on':''}" data-q="${it.id}" data-v="${c}" aria-pressed="${v===c}">${fill(l)}</button>`).join('')}</div>`;
+ if(it.t==='sel')return `<select id="f-${it.id}" data-q="${it.id}"><option value="">Pilih</option>${opts(it).map(([c,l])=>`<option value="${c}"${v===c?' selected':''}>${l}</option>`).join('')}</select>`;
+ if(it.t==='num')return `<div class="dur"><label><input type="number" inputmode="numeric" id="f-${it.id}" data-q="${it.id}" value="${v??''}" min="${it.min}" max="${it.max}"> ${it.unit}</label></div>`;
+ if(it.t==='txt')return `<input type="text" id="f-${it.id}" data-q="${it.id}" value="${esc(v??'')}" autocomplete="off">`;
+ if(it.t==='ini')return `<input type="text" class="ini" id="f-inisial" data-q="inisial" maxlength="4" value="${esc(v??'')}" autocomplete="off" placeholder="mis. AR">`;
+ if(it.t==='dur')return `<div class="dur">${[['th','tahun',60],['bl','bulan',11]].map(([s,u,m])=>`<label><input type="number" inputmode="numeric" id="f-${it.id}_${s}" data-q="${it.id}_${s}" min="0" max="${m}" value="${A[it.id+'_'+s]??''}"> ${u}</label>`).join('')}</div>`;
+ if(it.t==='grid')return `<div>${ASET.map((a,i)=>{const k='aset'+p2(i+1);return `<div class="row3" id="q-${k}"><span class="rl">${a} <code class="vc">${k}</code></span><div class="seg">${[[1,'Ya'],[0,'Tidak'],[98,'Tidak tahu']].map(([c,l])=>`<button type="button" class="sc${A[k]===c?' on':''}" data-q="${k}" data-v="${c}" aria-pressed="${A[k]===c}">${l}</button>`).join('')}</div></div>`}).join('')}</div>`;
+ if(it.t==='s4')return `<div class="s4">${[[1,'Sangat tidak setuju'],[2,'Tidak setuju'],[3,'Setuju'],[4,'Sangat setuju']].map(([c,l])=>`<button type="button" class="sc${v===c?' on':''}" data-q="${it.id}" data-v="${c}" aria-pressed="${v===c}">${l}</button>`).join('')}</div><div class="opt97"><button type="button" class="${v===97?'on':''}" data-q="${it.id}" data-v="97" aria-pressed="${v===97}">Tidak ingin menjawab</button></div>`;
+ if(it.t==='s9')return `<div class="s9">${[0,1,2,3,4,5,6,7,8].map(c=>`<button type="button" class="sc${v===c?' on':''}" data-q="${it.id}" data-v="${c}" aria-pressed="${v===c}" aria-label="${c}">${c}</button>`).join('')}</div><div class="anch"><span class="a0">Tidak pernah</span><span class="a2">Jarang</span><span class="a4">Kadang-kadang</span><span class="a6">Cukup sering</span><span class="a8">Selalu</span></div>`;
+}
+function qhtml(it,i){
+ const n=it.num||i+1;
+ const code=it.t==='grid'?'aset01–11':it.t==='dur'?it.id+'_th, _bl':it.id;
+ return `<div class="q" id="q-${it.id}"><div class="ql"><span class="qn">${n}</span><span class="qt">${fill(it.l)}</span><code class="vc">${code}</code></div>${it.help?`<p class="help">${it.help}</p>`:''}${ctl(it)}</div>`;
+}
+const order=()=>PAGES.map((p,i)=>i).filter(i=>vis(PAGES[i]));
+function render(keepScroll){
+ const M=document.getElementById('main'),y=scrollY;
+ if(A._end){renderEnd(M);return}
+ const p=PAGES[cur],its=items(p);
+ M.innerHTML=`${p.mfq?`<div class="remind">Masih tentang ${ini()}, teman yang Anda bayangkan.</div>`:''}<h2>${fill(p.title)}</h2>${p.intro?`<p class="intro">${fill(p.intro)}</p>`:''}${p.card?`<div class="card">${p.card}</div>`:''}${p.mfq?`<div class="legend"><span><b>0</b> Tidak pernah</span><span><b>2</b> Jarang</span><span><b>4</b> Kadang-kadang</span><span><b>6</b> Cukup sering</span><span><b>8</b> Selalu</span></div>`:''}${p.scale4?`<p class="legend">Jika tidak ingin menjawab sebuah pernyataan, pilih “Tidak ingin menjawab” di bawahnya.</p>`:''}${its.map(qhtml).join('')}<p class="msg" id="msg" hidden></p>`;
+ const o=order(),k=o.indexOf(cur);
+ document.getElementById('back').hidden=k<=0;
+ document.getElementById('next').textContent=k===o.length-1?'Kirim':'Lanjut';
+ const pc=Math.round(k/o.length*100);
+ document.getElementById('progi').style.width=pc+'%';
+ document.getElementById('pct').textContent=`${k+1} dari ${o.length}`;
+ document.getElementById('steps').innerHTML=SECS.map((s,i)=>`<span class="step${i<p.sec?' done':i===p.sec?' cur':''}">${s}</span>`).join('');
+ mark();
+ if(keepScroll)scrollTo(0,y);else scrollTo(0,0);
+}
+function mark(){
+ if(A._end)return;
+ const its=items(PAGES[cur]);let first=true;
+ for(const it of its){const el=document.getElementById('q-'+it.id);if(!el)continue;const ok=answered(it);el.classList.toggle('now',!ok&&first);if(!ok)first=false;if(ok)el.classList.remove('miss')}
+ for(let i=1;i<=ASET.length;i++){const el=document.getElementById('q-aset'+p2(i));if(el&&A['aset'+p2(i)]!=null)el.classList.remove('miss')}
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({A,cur}))}catch(e){}}
+const DEPS=['fak','pengasuh','teman','wawancara'];
+document.getElementById('main').addEventListener('click',e=>{
+ const b=e.target.closest('button[data-q]');if(!b)return;
+ const q=b.dataset.q,v=Number(b.dataset.v);
+ A[q]=v;
+ if(q==='fak')delete A.dept;
+ if(q==='pengasuh'&&v!==4){delete A.hub_wali;delete A.pend_wali}
+ if(q==='wawancara'&&v!==1)delete A.kontak;
+ if(q==='teman'&&v!==1){for(const k of Object.keys(A))if(/^(inisial|lama_|kenal|frek|teman_ugm|mfq)/.test(k))delete A[k]}
+ if(q==='consent'&&v===1&&!A.t_mulai)A.t_mulai=new Date().toISOString();
+ if(DEPS.includes(q)){render(true)}else{
+  for(const x of document.querySelectorAll(`button[data-q="${q}"]`)){const on=Number(x.dataset.v)===v;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on)}
+  mark();
+ }
+ save();
+});
+document.getElementById('main').addEventListener('input',e=>{
+ const f=e.target,q=f.dataset.q;if(!q)return;
+ if(f.type==='number'||f.tagName==='SELECT'){A[q]=f.value===''?null:Number(f.value);if(A[q]==null)delete A[q]}
+ else{A[q]=q==='inisial'?f.value.toUpperCase().replace(/[^A-Z]/g,''):f.value;if(q==='inisial')f.value=A[q]}
+ mark();save();
+});
+async function send(status){
+ const data={resp_id:rid(),t_mulai:A.t_mulai||'',t_selesai:A.t_selesai||''};
+ if(status==='selesai'){data.durasi_detik=A.t_mulai?Math.round((new Date(A.t_selesai)-new Date(A.t_mulai))/1000):'';for(const k of VARS())data[k]=A[k]??''}
+ if(status==='kriteria'){data.jk=A.jk??'';data.aktif=A.aktif??''}
+ const body=JSON.stringify({token:CONFIG.TOKEN,versi:CONFIG.VERSI,gelombang:location.hash==='#uji'?'uji':CONFIG.GELOMBANG,status,data,kontak:status==='selesai'&&A.wawancara===1?(A.kontak||''):''});
+ const r=await fetch(CONFIG.ENDPOINT,{method:'POST',body});
+ const j=await r.json();
+ if(!j.ok)throw new Error(j.err||'gagal');
+ return j;
+}
+function endEarly(kind){A._end=kind;save();render();if(LIVE)send(kind).catch(()=>{})}
+async function go(d){
+ const o=order(),k=o.indexOf(cur);
+ if(d>0){
+  const miss=items(PAGES[cur]).filter(it=>!answered(it));
+  if(miss.length){
+   for(const it of miss){document.getElementById('q-'+it.id)?.classList.add('miss');if(it.t==='grid')ASET.forEach((_,i)=>{if(A['aset'+p2(i+1)]==null)document.getElementById('q-aset'+p2(i+1))?.classList.add('miss')})}
+   const m=document.getElementById('msg');m.hidden=false;m.textContent=miss.length===1?'Masih ada 1 pertanyaan yang belum dijawab.':`Masih ada ${miss.length} pertanyaan yang belum dijawab.`;
+   document.getElementById('q-'+miss[0].id)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+   return;
+  }
+  if(cur===0&&A.consent===0){endEarly('tolak');return}
+  if(PAGES[cur].sec===1&&(A.jk===2||A.aktif===0)){endEarly('kriteria');return}
+  if(k===o.length-1){
+   A.t_selesai=new Date().toISOString();rid();save();
+   if(LIVE){
+    const nb=document.getElementById('next'),m=document.getElementById('msg');
+    nb.disabled=true;nb.textContent='Mengirim…';m.hidden=true;
+    try{await send('selesai')}catch(e){
+     nb.disabled=false;nb.textContent='Kirim lagi';m.hidden=false;
+     m.textContent='Jawaban belum terkirim. Periksa koneksi internet, lalu tekan Kirim lagi. Jawaban Anda tetap tersimpan di perangkat ini.';
+     return;
+    }
+    nb.disabled=false;
+   }
+   A._end='selesai';save();render();return;
+  }
+  cur=o[k+1];
+ }else if(k>0)cur=o[k-1];
+ save();render();
+}
+document.getElementById('next').addEventListener('click',()=>go(1));
+document.getElementById('back').addEventListener('click',()=>go(-1));
+const VARS=()=>['consent','jk','aktif','usia','fak','dept','angkatan','pend_ayah','pend_ibu','pengasuh','hub_wali','pend_wali',...ASET.map((_,i)=>'aset'+p2(i+1)),'rumah','lantai','air','listrik',...Array.from({length:21},(_,i)=>'mrni'+p2(i+1)),'teman','inisial','lama_teman_th','lama_teman_bl','lama_dekat_th','lama_dekat_bl','kenal','frek','teman_ugm',...Array.from({length:30},(_,i)=>'mfq'+p2(i+1)),'wawancara'];
+function rid(){if(!A.resp_id)A.resp_id='R'+Math.random().toString(36).slice(2,8).toUpperCase();return A.resp_id}
+function csv(){const v=['resp_id','t_mulai','t_selesai','durasi_detik',...VARS()];const dur=A.t_mulai&&A.t_selesai?Math.round((new Date(A.t_selesai)-new Date(A.t_mulai))/1000):'';const row=v.map(k=>k==='durasi_detik'?dur:k==='resp_id'?rid():(A[k]??''));return v.join(',')+'\n'+row.map(x=>/[",\n]/.test(String(x))?`"${String(x).replace(/"/g,'""')}"`:x).join(',')}
+function renderEnd(M){
+ const t={tolak:['Terima kasih','Anda memilih untuk tidak berpartisipasi. Tidak ada jawaban yang disimpan.'],kriteria:['Terima kasih atas kesediaan Anda','Penelitian ini khusus untuk mahasiswa laki-laki program sarjana yang aktif di UGM, jadi kuesioner berakhir di sini.'],selesai:['Terima kasih, jawaban Anda sudah lengkap','Partisipasi Anda sangat membantu penelitian ini. Halaman ini boleh ditutup.']}[A._end];
+ document.getElementById('steps').innerHTML=SECS.map(s=>`<span class="step done">${s}</span>`).join('');
+ document.getElementById('progi').style.width='100%';document.getElementById('pct').textContent='Selesai';
+ document.getElementById('back').hidden=true;document.getElementById('next').hidden=true;
+ const n97=Object.keys(A).filter(k=>k.startsWith('mrni')&&A[k]===97).length;
+ const dur=A.t_mulai&&A.t_selesai?Math.round((new Date(A.t_selesai)-new Date(A.t_mulai))/60000):null;
+ M.innerHTML=`<div class="end"><h2>${t[0]}</h2><p class="intro">${t[1]}</p>${A._end==='selesai'?`<p class="intro">Kode responden Anda: <b>${rid()}</b>. Simpan kode ini jika suatu saat ingin menarik jawaban Anda dari penelitian.</p>`:''}${A._end==='selesai'&&UJI?`<div class="card"><p><b>Untuk peneliti (uji coba).</b> Satu baris data sesuai codebook. Kontak wawancara tidak ikut di baris ini.</p><dl class="kv"><dt>Kode responden</dt><dd>${rid()}</dd><dt>Durasi pengisian</dt><dd>${dur!=null?dur+' menit':'–'}</dd><dt>Butir MRNI dijawab 97</dt><dd>${n97} dari 21</dd><dt>Pertemanan diisi</dt><dd>${A.teman===1?'Ya, tentang '+esc(A.inisial):'Tidak (lolos ke wawancara)'}</dd><dt>Bersedia wawancara</dt><dd>${A.wawancara===1?'Ya':'Tidak'}</dd></dl><div class="acts"><button class="btn" id="cpcsv" type="button">Salin baris CSV</button><button class="btn sec" id="cpjson" type="button">Salin JSON</button></div><textarea id="out" readonly hidden></textarea></div>`:''}${UJI?`<div class="acts"><button class="btn sec" id="again" type="button">Isi ulang dari awal</button></div>`:''}</div>`;
+ save();
+}
+async function copy(txt,btn){const out=document.getElementById('out');out.hidden=false;out.value=txt;try{await navigator.clipboard.writeText(txt);btn.textContent='Tersalin'}catch(e){out.select();btn.textContent='Pilih teks di bawah lalu salin'}}
+document.getElementById('main').addEventListener('click',e=>{
+ if(e.target.id==='cpcsv')copy(csv(),e.target);
+ if(e.target.id==='cpjson'){const o={resp_id:rid()};for(const k of Object.keys(A))if(!k.startsWith('_')&&k!=='kontak')o[k]=A[k];copy(JSON.stringify(o,null,1),e.target)}
+ if(e.target.id==='again')restart();
+});
+function restart(){A={};cur=0;document.getElementById('next').hidden=false;save();render()}
+document.getElementById('reset').addEventListener('click',restart);
+document.getElementById('codes').addEventListener('change',e=>{document.body.classList.toggle('codes',e.target.checked);try{localStorage.setItem(KEY+'-codes',e.target.checked?'1':'')}catch(x){}});
+document.getElementById('fill').addEventListener('click',()=>{
+ const r=a=>a[Math.floor(Math.random()*a.length)];
+ Object.assign(A,{consent:1,jk:1,aktif:1,usia:20+Math.floor(Math.random()*4),fak:r([1,2]),angkatan:r([2022,2023,2024,2025]),pend_ayah:r([4,6,7]),pend_ibu:r([4,5,6]),pengasuh:1,rumah:1,lantai:1,air:1,listrik:r([2,3,4]),teman:1,inisial:r(['AR','DF','RH','BS']),lama_teman_th:r([1,2,4]),lama_teman_bl:r([0,3,6]),lama_dekat_th:1,lama_dekat_bl:r([0,6]),kenal:r([1,2,3]),frek:r([3,4,5]),teman_ugm:1,wawancara:r([0,1]),t_mulai:A.t_mulai||new Date().toISOString()});
+ A.dept=r(DEPT[A.fak])[0];
+ ASET.forEach((_,i)=>A['aset'+p2(i+1)]=r([0,1,1]));
+ for(let i=1;i<=21;i++)A['mrni'+p2(i)]=r([1,2,2,3,3,4,97]);
+ for(let i=1;i<=30;i++)A['mfq'+p2(i)]=r([4,5,6,6,7,7,8]);
+ if(A.wawancara===1)A.kontak='0812-0000-0000';
+ delete A._end;cur=PAGES.length-1;document.getElementById('next').hidden=false;save();render();
+});
+function start(d){
+ if(UJI){document.getElementById('tools').hidden=false;document.getElementById('sub').textContent+=LIVE?' Mode uji: jawaban tetap terkirim.':' Pratinjau: jawaban tidak dikirim ke mana pun.'}
+ try{const s=d&&d.A?d:JSON.parse(localStorage.getItem(KEY)||'null');if(s){A=s.A||{};cur=s.cur||0}}catch(e){}
+ try{if(localStorage.getItem(KEY+'-codes')){document.getElementById('codes').checked=true;document.body.classList.add('codes')}}catch(e){}
+ if(!PAGES[cur])cur=0;
+ if(A._end)document.getElementById('next').hidden=true;
+ render();
+}
+window.claude?.hot?.snapshot?.(()=>({A,cur}));
+window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
+}
+</script>
+</body>
+</html>

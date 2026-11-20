@@ -1,0 +1,5 @@
+# Jangan pernah commit data responden ke repo publik ini
+*.csv
+*.xlsx
+*.dta
+data/
